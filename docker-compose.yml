@@ -1,0 +1,46 @@
+version: '1'
+services:
+
+  wordpress:
+    image: wordpress
+    ports:
+      - ${APP_PORT}:80
+    environment:
+      WORDPRESS_DB_HOST: mysql
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+    volumes:
+      - ./www:/var/www/html
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.0
+    volumes:
+      - ./database:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    restart: unless-stopped
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - ${PHPMYADMIN_PORT}:80
+    links:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+    restart: unless-stopped
+
+  adminer:
+    image: adminer
+    ports:
+      - ${ADMINER_PORT}:80
+    links:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+    restart: unless-stopped
